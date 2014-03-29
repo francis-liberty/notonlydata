@@ -1,0 +1,30 @@
+{
+  "name": "notonlydata",
+  "version": "0.1.0",
+  "description": "not only data, but also visualization!",
+  "main": "nod.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/francis-liberty/notonlydata.git"
+  },
+  "keywords": [
+    "data",
+    "visualization"
+  ],
+  "author": "Francis Chan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/francis-liberty/notonlydata/issues"
+  },
+  "homepage": "https://github.com/francis-liberty/notonlydata",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
