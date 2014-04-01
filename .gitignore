@@ -36,3 +36,8 @@ nosetests.xml
 .project
 .pydevproject
 nod.js
+nod.css
+*.jpg
+*.png
+*.pdf
+node_modules/

@@ -10,6 +10,7 @@ module.exports = function(grunt) {
                 src: [
                      'src/js/start.js',
                      'src/js/bubbles.js',
+                     'src/js/graph.js',
                      'src/js/end.js'
                      ],
                 dest: 'nod.js'
