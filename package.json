@@ -25,6 +25,7 @@
   "homepage": "https://github.com/francis-liberty/notonlydata",
   "devDependencies": {
     "grunt": "~0.4.4",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-sass": "~0.7.3"
   }
 }

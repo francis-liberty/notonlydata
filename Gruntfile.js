@@ -8,14 +8,22 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                     'src/start.js',
-                     'src/bubbles.js',
-                     'src/end.js'
+                     'src/js/start.js',
+                     'src/js/bubbles.js',
+                     'src/js/end.js'
                      ],
                 dest: 'nod.js'
             }
         },
+    sass: {
+          dist: {
+            files: {
+              'nod.css': 'src/scss/nod.scss'
+            }
+          }
+        }
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-sass');
 };
