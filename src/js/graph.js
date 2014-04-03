@@ -6,23 +6,40 @@ nod.graph = function () {
     , height = 1600
     , width = 900
     , colors = d3.scale.category20()
-    , radius = 15
+    , defaultR = 15
     , maxRadius = 50
+    , maxLinkWeight = 20
+    , rDistr = []
     , deg = []
+    , lineWeight = []
+
+    , autoR = true
   ;
 
   function preprocess (graph) {
     for (var i in graph.nodes) {
-      graph.nodes[i].links = [];
+      var nd = graph.nodes[i];
+      nd.links = [];
+      autoR = nd.r ? false: true;
     }
+
     for (var i in graph.links) {
       var link = graph.links[i];
       graph.nodes[link.source].links.push(i);
       graph.nodes[link.target].links.push(i);
+      lineWeight[i] = link.value;
     }
+
     for (var i in graph.nodes) {
       deg[i] = graph.nodes[i].links.length;
     }
+
+    if (!autoR) {
+      for (var i in graph.nodes) {
+        rDistr[i] = graph.nodes[i].r;
+      }
+    }
+
     return graph;
   }
 
@@ -30,9 +47,14 @@ nod.graph = function () {
   	selection.each(function (graph) {
       var d = preprocess(graph);
 
+      var rDomain = autoR ? deg : rDistr
       var r = d3.scale.linear()
-          .domain(d3.extent(deg))
+          .domain(d3.extent(rDomain))
           .range([1, maxRadius])
+
+      var lw = d3.scale.linear()
+          .domain(d3.extent(lineWeight))
+          .range([1, maxLinkWeight])
 
       var force = d3.layout.force()
           .nodes(graph.nodes)
@@ -76,7 +98,9 @@ nod.graph = function () {
           .data(force.links())
         .enter().append("line")
           .attr("class", "link")
-          .style("stroke-width", function (d) { return Math.sqrt(d.value); })
+          .style("stroke-width", function (d) { 
+            return lw(Math.sqrt(d.value));
+          })
           // .attr("marker-end", function (d) { return "url(#" + d.type + ")"; })
 
       var node = plot.selectAll(".node")
@@ -85,7 +109,9 @@ nod.graph = function () {
           .style('stroke', function (d, i) { return colors(d.color); })
           .style('stroke-width', 2)
           .style('fill', 'white')
-          .attr("r", function (d) { return r(d.links.length); })
+          .attr("r", function (d) { 
+            return d.r ? r(d.r) : r(d.links.length); 
+          })
           .attr('id', function (d, i) { return 'node-' + i; })
           .attr('class', 'node')
           .attr('data-idty', function (d) { return d.idty;})
