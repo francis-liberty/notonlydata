@@ -6,14 +6,17 @@ nod.graph = function () {
     , height = 1600
     , width = 900
     , colors = d3.scale.category20()
-    , defaultR = 15
     , maxRadius = 50
     , maxLinkWeight = 20
+
+    // force
+    , force_layout = {linkDistance: 200, charge: -200}
+
+    // these are implicitly, automatically inferred
+    , autoR = true
     , rDistr = []
     , deg = []
     , lineWeight = []
-
-    , autoR = true
   ;
 
   function preprocess (graph) {
@@ -59,9 +62,9 @@ nod.graph = function () {
       var force = d3.layout.force()
           .nodes(graph.nodes)
           .links(graph.links)
-          .linkDistance(200)
+          .linkDistance(force_layout.linkDistance)
           .size([width, height])
-          .charge(-200)
+          .charge(force_layout.charge)
           .on("tick", tick)
           .start();
 
@@ -188,6 +191,25 @@ nod.graph = function () {
     maxRadius = _;
     return chart;
   }
+
+  chart.maxLinkWeight = function (_) {
+    if (!arguments.length) return maxLinkWeight;
+    maxLinkWeight = _;
+    return chart;
+  }
+
+  chart.force_layout = function (_) {
+    if (!arguments.length) return force_layout;
+    force_layout = $.extend(force_layout, _);
+    return chart;
+  }
+
+  chart.margin = function (_) {
+    if (!arguments.length) return margin;
+    margin = $.extend(margin, _);
+    return chart;
+  }
+
 
   return chart;
 };
