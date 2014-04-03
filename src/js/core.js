@@ -1,0 +1,1 @@
+nod.widgets = nod.widgets || {};

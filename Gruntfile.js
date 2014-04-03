@@ -9,8 +9,10 @@ module.exports = function(grunt) {
             dist: {
                 src: [
                      'src/js/start.js',
+                     'src/js/core.js',
                      'src/js/bubbles.js',
                      'src/js/graph.js',
+                     'src/js/widgets/list.js',
                      'src/js/end.js'
                      ],
                 dest: 'nod.js'
