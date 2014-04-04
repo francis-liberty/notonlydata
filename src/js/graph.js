@@ -8,7 +8,7 @@ nod.graph = function (container) {
 	  , colors = d3.scale.category20()
 	  , maxRadius = 50
 	  , maxLinkWeight = 20
-    , container = container
+    , container = container || 'body'
 
 	  // force
 	  , force_layout = {linkDistance: 200, charge: -200}
@@ -132,6 +132,7 @@ nod.graph = function (container) {
         .data(force.nodes())
       .enter().append('a')
         .attr("xlink:href", function(d) { return d.url; })
+        .attr("target", '_blank')
         .append("text")
         .attr("x", function (d) { return r(d.links.length)+2;})
         .attr("y", ".31em")

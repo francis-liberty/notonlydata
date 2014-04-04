@@ -5,7 +5,7 @@ nod.widgets.list = function (container) {
     , height = 1600
     , width = 900
     , colors = d3.scale.category20()
-    , container = container
+    , container = container || 'body'
 
     , data_list
   ;
@@ -19,14 +19,8 @@ nod.widgets.list = function (container) {
   chart.draw = function (data) {
     var d = preprocess(data);
 
-    var ul = document.createElement('ul');
-    var $ul = $(ul);
-    for (var i in d) {
-      var li = document.createElement('li');
-      $(li).append(document.createTextNode(d[i]))
-           .attr('id', 'list-' + i);
-      $ul.append(li);
-    }
+    var ul = nod_ul(data);
+
     $(container).append(ul);
   }
 
@@ -38,7 +32,7 @@ nod.widgets.list = function (container) {
 
   chart.width = function (_) {
 		if (!arguments.length) return width;
-		width = _;  
+		width = _;
 		return chart;
 	}
 
@@ -47,6 +41,17 @@ nod.widgets.list = function (container) {
 		height = _;
 		return chart;
 	}
+  
+  // var properties = ['width', 'height'];
+  // for (var i in properties) { (function () {
+  //   var property = properties[i];
+  //   chart[property] = function (_) {
+  //     if (!arguments.length) return eval(property);
+  //     property = _;
+  //     return chart;
+  //   }
+  // })();
+  // }
 
   return chart;
 };

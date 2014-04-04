@@ -1,4 +1,4 @@
-nod.bubbles = function () {
+nod.bubbles = function (container) {
   'use strict';
 
   var maxRadius = 20
@@ -15,7 +15,11 @@ nod.bubbles = function () {
     , header = []
     , colors = d3.scale.category20()
     , markers = []
+
+    , container = container || 'body'
   	;
+
+  var chart = chart || {};
 
   function preprocess (data) {
     var res = [];
@@ -47,58 +51,55 @@ nod.bubbles = function () {
     return res;
   }
 
+  chart.draw = function (data) {
+    var d = preprocess(data);
+
+    var plot = d3.select(container).append('svg').append('g');
+
+    // draw the actual content
+    var board = plot.append('g')
+        .attr('transform', function (d, i) { return 'translate(' + margin.left + ',' + margin.top + ')'; });
+
+    var line = board.selectAll('g')
+        .data(d)
+      .enter().append('g')
+        .attr('transform', function (d, i) { return "translate(0," + i*lineHeight + ")" ; })
+
+    line.append('text')
+        .text(function (d) { return d.word; })
+        .attr('y', fontSize/2)
+        .attr('x', -margin.left)
+
+    var padding = width/n_X;
+    var count = line.selectAll('.count')
+        .data(function (d) {
+          return d.count;
+        })
+      .enter().append('circle')
+        .attr('cx', function (d, i) { return i*padding; })
+        .attr('r', function (d) { return d/max * maxRadius; })
+        .style('fill', function (d, i) { return colors(i); })
+        .style('opacity', 0.8)
+
+    // draw x-axis
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom')
+        .tickValues(markers)
+
+    plot.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', function (d, i) { return 'translate(' + margin.left + ', 0)';})
+        .call(xAxis)
+      .selectAll('.tick text')
+        .style('text-anchor', 'start')
+        .attr('x', 6)
+        .attr('y', 6)
+  }
+
   // the whole chart is a plot
   // board is the actual drawing area
   // each count is drawn in one line
-  function chart (selection) {
-  	selection.each(function (data) {
-      var d = preprocess(data);
-
-  		var plot = d3.select(this).append('g')
-
-      // draw the actual content
-  		var board = plot.append('g')
-  				.attr('transform', function (d, i) { return 'translate(' + margin.left + ',' + margin.top + ')'; });
-
-  		var line = board.selectAll('g')
-  			  .data(d)
-  			.enter().append('g')
-  				.attr('transform', function (d, i) { return "translate(0," + i*lineHeight + ")" ; })
-
-  		line.append('text')
-  				.text(function (d) { return d.word; })
-  				.attr('y', fontSize/2)
-          .attr('x', -margin.left)
-
-      var padding = width/n_X;
-  		var count = line.selectAll('.count')
-  			  .data(function (d) {
-  			  	return d.count;
-  			  })
-  			.enter().append('circle')
-  				.attr('cx', function (d, i) { return i*padding; })
-  				.attr('r', function (d) { return d/max * maxRadius; })
-          .style('fill', function (d, i) { return colors(i); })
-          .style('opacity', 0.8)
-
-      // draw x-axis
-      var xAxis = d3.svg.axis()
-          .scale(x)
-          .orient('bottom')
-          .tickValues(markers)
-
-      plot.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', function (d, i) { return 'translate(' + margin.left + ', 0)';})
-          .call(xAxis)
-        .selectAll('.tick text')
-          .style('text-anchor', 'start')
-          .attr('x', 6)
-          .attr('y', 6)
-  	});
-    
-    return chart;
-  }
 
   chart.width = function (_) {
 		if (!arguments.length) return width;
