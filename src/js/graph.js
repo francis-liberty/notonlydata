@@ -1,23 +1,29 @@
-nod.graph = function () {
+nod.graph = function (container) {
   'use strict';
 
   var margin = {top: 0, bottom: 0, left: 0, right: 0}
-    , directed = false
-    , height = 1600
-    , width = 900
-    , colors = d3.scale.category20()
-    , maxRadius = 50
-    , maxLinkWeight = 20
+	  , directed = false
+	  , height = 1600
+	  , width = 900
+	  , colors = d3.scale.category20()
+	  , maxRadius = 50
+	  , maxLinkWeight = 20
+    , container = container
 
-    // force
-    , force_layout = {linkDistance: 200, charge: -200}
+	  // force
+	  , force_layout = {linkDistance: 200, charge: -200}
 
-    // these are implicitly, automatically inferred
-    , autoR = true
-    , rDistr = []
-    , deg = []
-    , lineWeight = []
+	  // these are implicitly, automatically inferred
+	  , autoR = true
+	  , rDistr = []
+	  , deg = []
+	  , lineWeight = []
+
+    // internal variables
+    , gr
   ;
+
+  var chart = chart || {};
 
   function preprocess (graph) {
     for (var i in graph.nodes) {
@@ -46,27 +52,28 @@ nod.graph = function () {
     return graph;
   }
 
-  function chart (selection) {
-  	selection.each(function (graph) {
-      var d = preprocess(graph);
+  chart.draw = function (graph) {
+    gr = graph;
+  	var d = preprocess(gr);
 
-      var rDomain = autoR ? deg : rDistr
-      var r = d3.scale.linear()
-          .domain(d3.extent(rDomain))
-          .range([1, maxRadius])
+  	// auto infer
+    var rDomain = autoR ? deg : rDistr
+    var r = d3.scale.linear()
+        .domain(d3.extent(rDomain))
+        .range([1, maxRadius])
 
-      var lw = d3.scale.linear()
-          .domain(d3.extent(lineWeight))
-          .range([1, maxLinkWeight])
+    var lw = d3.scale.linear()
+        .domain(d3.extent(lineWeight))
+        .range([1, maxLinkWeight])
 
-      var force = d3.layout.force()
-          .nodes(graph.nodes)
-          .links(graph.links)
-          .linkDistance(force_layout.linkDistance)
-          .size([width, height])
-          .charge(force_layout.charge)
-          .on("tick", tick)
-          .start();
+    var force = d3.layout.force()
+        .nodes(gr.nodes)
+        .links(gr.links)
+        .linkDistance(force_layout.linkDistance)
+        .size([width, height])
+        .charge(force_layout.charge)
+        .on("tick", tick)
+        .start();
 
       // var marker = d3.select(this).append('defs').selectAll('.marker')
       //     .data(['killed', 'attempted'])
@@ -93,85 +100,77 @@ nod.graph = function () {
       //     .attr('width', radius)
       //     .attr('height', radius)
 
-      var plot = d3.select(this).append('g')
-          .attr('class', 'graph')
-          .attr('transform', function (d, i) { return 'translate(' + margin.left + ',' + margin.top + ')'; });
-   
-      var link = plot.selectAll(".link")
-          .data(force.links())
-        .enter().append("line")
-          .attr("class", "link")
-          .style("stroke-width", function (d) { 
-            return lw(Math.sqrt(d.value));
-          })
-          // .attr("marker-end", function (d) { return "url(#" + d.type + ")"; })
+    var plot = d3.select(container).append('svg')
+        .append('g')
+        .attr('class', 'graph')
+        .attr('transform', function (d, i) { return 'translate(' + margin.left + ',' + margin.top + ')'; });
+ 
+    var link = plot.selectAll(".link")
+        .data(force.links())
+      .enter().append("line")
+        .attr("class", "link")
+        .style("stroke-width", function (d) { 
+          return lw(Math.sqrt(d.value));
+        })
+        // .attr("marker-end", function (d) { return "url(#" + d.type + ")"; })
 
-      var node = plot.selectAll(".node")
-          .data(force.nodes())
-        .enter().append("circle")
-          .style('stroke', function (d, i) { return colors(d.color); })
-          .style('stroke-width', 2)
-          .style('fill', 'white')
-          .attr("r", function (d) { 
-            return d.r ? r(d.r) : r(d.links.length); 
-          })
-          .attr('id', function (d, i) { return 'node-' + i; })
-          .attr('class', 'node')
-          .attr('data-idty', function (d) { return d.idty;})
-          .call(force.drag);
+    var node = plot.selectAll(".node")
+        .data(force.nodes())
+      .enter().append("circle")
+        .style('stroke', function (d, i) { return colors(d.color); })
+        .style('stroke-width', 2)
+        .style('fill', 'white')
+        .attr("r", function (d) { 
+          return d.r ? r(d.r) : r(d.links.length); 
+        })
+        .attr('id', function (d, i) { return 'node-' + i; })
+        .attr('class', 'node')
+        .attr('data-idty', function (d) { return d.idty;})
+        .call(force.drag);
 
-      var text = plot.selectAll("text")
-          .data(force.nodes())
-        .enter().append('a')
-          .attr("xlink:href", function(d) { return d.url; })
-          .append("text")
-          .attr("x", function (d) { return r(d.links.length)+2;})
-          .attr("y", ".31em")
-          .style('display', 'none')
-          .attr('id', function (d, i) { return 'text-' + i; })
-          .attr('data-idty', function (d) { return d.idty;})
-          .text(function(d) { return d.name; });
+    var text = plot.selectAll("text")
+        .data(force.nodes())
+      .enter().append('a')
+        .attr("xlink:href", function(d) { return d.url; })
+        .append("text")
+        .attr("x", function (d) { return r(d.links.length)+2;})
+        .attr("y", ".31em")
+        .style('display', 'none')
+        .attr('id', function (d, i) { return 'text-' + i; })
+        .attr('data-idty', function (d) { return d.idty;})
+        .text(function(d) { return d.name; });
 
-      function tick() {
-        node.attr("transform", transform);
-        text.attr("transform", transform);
-        link.attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+    function tick() {
+      node.attr("transform", transform);
+      text.attr("transform", transform);
+      link.attr("x1", function(d) { return d.source.x; })
+          .attr("y1", function(d) { return d.source.y; })
+          .attr("x2", function(d) { return d.target.x; })
+          .attr("y2", function(d) { return d.target.y; });
 
-        force.stop();
-        setTimeout(function () {
-          force.start();
-        }, 100);
-      }
+      force.stop();
+      setTimeout(function () {
+        force.start();
+      }, 100);
+    }
 
-      function transform(d) {
-        return "translate(" + d.x + "," + d.y + ")";
-      }
+    function transform(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    }
+  }
 
-      // animation
-      var that = this;
-      $(this).on('mouseenter', '.node', function (e) {
-        // hide all
-        $(that).find('text').hide();
-        $(that).find('circle')
-          .css('fill', 'white');
+  chart.highlightNode = function (node_id) {
+    $(container).find('text').hide();
+    $(container).find('circle').css('fill', 'white');
 
-        var idx = $(this).attr('id').split('-')[1];
-        var node = graph.nodes[idx];
-        for (var _ in node.links) {
-          var i = node.links[_];
-          $('#text-'+graph.links[i].target.index).show();
-          $('#node-'+graph.links[i].target.index)
-            .css('fill', 'gray')
+    var nd = gr.nodes[node_id];
+    for (var _ in nd.links) {
+      var i = nd.links[_];
+      $('#text-'+gr.links[i].target.index).show();
+      $('#node-'+gr.links[i].target.index).css('fill', 'gray')
 
-          $('#text-'+graph.links[i].source.index).show();
-        }
-      })
-  	});
-
-    return chart;
+      $('#text-'+gr.links[i].source.index).show();
+    }
   }
 
   chart.width = function (_) {
@@ -209,7 +208,6 @@ nod.graph = function () {
     margin = $.extend(margin, _);
     return chart;
   }
-
 
   return chart;
 };
