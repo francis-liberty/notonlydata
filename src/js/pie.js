@@ -1,11 +1,12 @@
 nod.pie = function (container) {
   'use strict';
 
-  var margin = {top: 0, bottom: 0, left: 0, right: 0}
+  var margin = 10
   	, height = 400
   	, width = 960
     , colors = d3.scale.category20()
     , container = container || 'body'
+    , showText = true
 
     // inferred
     , radius = Math.min(width, height) / 2;
@@ -21,7 +22,7 @@ nod.pie = function (container) {
 		var d = preprocess(data);
 
     var arc = d3.svg.arc()
-		    .outerRadius(radius - 10)
+		    .outerRadius(radius - margin)
 		    .innerRadius(0);
 
 		var pie = d3.layout.pie()
@@ -37,18 +38,41 @@ nod.pie = function (container) {
 	  var g = plot.selectAll(".arc")
 	      .data(pie(d))
 	    .enter().append("g")
-	      .attr("class", "arc");
+	      .attr("class", "arc")
+	      .attr('id', function (d, i) { return 'bar-'+i; });
 
 	  g.append("path")
 	      .attr("d", arc)
 	      .style("fill", function(d, i) { return colors(i); });
 
 	  g.append("text")
-	      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+	  		.attr('id', function (d, i) { return 'text-'+i; })
+	      .attr("transform", function(d) {
+	      	return "translate(" + arc.centroid(d).map(function (d) { return d*2; }) + ")"; 
+	      })
 	      .attr("dy", ".35em")
+	      .style('display', function () { return showText ? 'block' : 'none'; })
 	      .style("text-anchor", "middle")
 	      .text(function(d) { return d.data.name; });
   }
+
+  chart.highlightBar = function (bar_id) {
+  	$(container).find('.arc').css('opacity', 0.3);
+  	$(container).find('#bar-'+bar_id).css('opacity', 1);
+  	$(container).find('#text-'+bar_id).show();
+  }
+
+  chart.restore = function (bar_id) {
+  	// $(container).find('.arc').show();
+  	$(container).find('.arc').css('opacity', 1);
+  	$(container).find('text').hide();
+  }
+
+  chart.margin = function (_) {
+		if (!arguments.length) return margin;
+		margin = _;
+		return chart;
+	}
 
   chart.width = function (_) {
 		if (!arguments.length) return width;
@@ -61,6 +85,12 @@ nod.pie = function (container) {
 		if (!arguments.length) return height;
 		height = _;
 		radius = Math.min(width, height) / 2;
+		return chart;
+	}
+
+  chart.showText = function (_) {
+		if (!arguments.length) return showText;
+		showText = _;
 		return chart;
 	}
 
