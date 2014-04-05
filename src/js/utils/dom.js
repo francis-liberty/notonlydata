@@ -16,3 +16,15 @@ function nod_ul(d) {
 
   return ul;
 }
+
+function nod_search_box() {
+  'use strict';
+
+
+  var form = document.createElement('form');
+  $(form)
+  		.attr('class', 'search-box')
+      .append('<input type="text" name="query">')
+      .append('<input type="button" value="Search">');
+  return form;
+}

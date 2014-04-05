@@ -17,6 +17,8 @@ nod.widgets.list = function (container) {
   }
 
   chart.draw = function (data) {
+    // data must be an array, containing objects.
+    // object must have {name: "name"} to display
     var d = preprocess(data);
 
     var ul = nod_ul(data);
