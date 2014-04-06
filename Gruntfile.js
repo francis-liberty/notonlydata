@@ -11,6 +11,7 @@ module.exports = function(grunt) {
                      'src/js/start.js',
                      'src/js/core.js',
                      'src/js/utils/*.js',
+                     'src/js/scatter.js',
                      'src/js/bubbles.js',
                      'src/js/line.js',
                      'src/js/graph.js',
