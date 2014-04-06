@@ -14,6 +14,7 @@ module.exports = function(grunt) {
                      'src/js/bubbles.js',
                      'src/js/graph.js',
                      'src/js/pie.js',
+                     'src/js/bundle.js',
                      'src/js/widgets/*.js',
                      'src/js/end.js'
                      ],
