@@ -13,6 +13,7 @@ module.exports = function(grunt) {
                      'src/js/utils/*.js',
                      'src/js/scatter.js',
                      'src/js/bubbles.js',
+                     'src/js/bar.js',
                      'src/js/line.js',
                      'src/js/graph.js',
                      'src/js/pie.js',
